@@ -1,0 +1,47 @@
+name: Build GIA APK Alternative
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk-alt:
+    runs-on: ubuntu-24.04
+
+    steps:
+      # 1. Checkout del repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configurar Python 3.11
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      # 3. Instalar dependencias
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip openjdk-17-jdk
+          python -m pip install --upgrade pip
+          pip install buildozer cython
+
+      # 4. Aceptar licencias de Android
+      - name: Accept Android Licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
+      # 5. Construir APK
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      # 6. Subir APK como artifact
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GIA-APK-Alternative
+          path: bin/*.apk
+
