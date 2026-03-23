@@ -1,0 +1,55 @@
+name: Build GIA APK Full
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-24.04
+
+    steps:
+      # 1️⃣ Hacer checkout del repositorio
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 2️⃣ Configurar Python 3.11
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      # 3️⃣ Instalar dependencias necesarias
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip openjdk-17-jdk wget
+          python -m pip install --upgrade pip
+          pip install buildozer cython
+
+      # 4️⃣ Configurar SDK y Build-tools de Android
+      - name: Install Android SDK & Build-tools
+        run: |
+          ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          cd $ANDROID_SDK_ROOT/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip
+          rm cmdline-tools.zip
+          mv cmdline-tools latest
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
+      # 5️⃣ Construir APK
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      # 6️⃣ Subir APK como artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GIA-APK
+          path: bin/*.apk
+
