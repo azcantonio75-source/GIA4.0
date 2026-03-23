@@ -3,7 +3,7 @@
 # --- Configuración de usuario, correo y token ---
 GITHUB_USER="Azcantonio75"
 GITHUB_EMAIL="Azcantonio75@gmail.com"
-GITHUB_TOKEN="N"
+GITHUB_TOKEN=""
 REPO_NAME="Azcantonio75-source"
 REPO_URL="https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USER/$REPO_NAME.git"
 
@@ -80,3 +80,4 @@ git remote add origin $REPO_URL
 git push -u origin main
 
 echo "¡Todo listo, Gio! Tu proyecto está en GitHub ($REPO_NAME) y la nube compilará la APK automáticamente."
+
